@@ -45,7 +45,7 @@ Ps:如果闪退,请打开debian.exe按照提示解决.
 
 2、执行命令安装Debian (总感觉Ubutnu比较臃肿)
 
-`bash <(curl -s https://github.com/Huucong95/HaisTools-V4/blob/main/Bin/0.Install.sh)`
+`bash <(curl -s https://raw.githubusercontent.com/Huucong95/HaisTools-V4/main/Bin/0.Install.sh)`
 
 3、安装好 Debian 后，重启软件、记得要重启、重启、重启后继续。
 
