@@ -23,7 +23,7 @@ PS：群内有使用教程、精简列表请前往Q群 [927251103](https://jq.qq
 
 ###### 在电脑(x86、x64)的Ubuntu、Debian中可直接输入命令使用。
 
-`bash <(curl -s https://github.com/Huucong95/HaisTools-V4/blob/main/Bin/0.NetInstall.sh)`
+`bash <(curl -s https://raw.githubusercontent.com/Huucong95/HaisTools-V4/main/Bin/0.NetInstall.sh)`
 
 
 ###### 在支持 WSL 的 Windows10、11上使用。
