@@ -1,0 +1,246 @@
+#!/bin/bash
+BASH_PATH=/tmp/Hais/ReplaceFile
+BY=/tmp/Hais/ReplaceFile/busybox
+
+ui_print() {
+	echo "\n $1 \n"
+  #echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+}
+
+
+mount -o rw /system || mount -o rw,remount /system
+mount -o rw /system_root || mount -o rw,remount /system_root
+mount -o rw /cust || mount -o rw,remount /cust
+$BY rm -rf /cust/*
+
+if [ -f "/sbin/xinkid_install_twrp.zip" ]; then
+    mkdir -p /tmp/xinkid_install_twrp/
+    cd /tmp/xinkid_install_twrp/
+    cp /sbin/xinkid_install_twrp.zip /tmp/xinkid_install_twrp/xinkid_install_twrp.zip
+    $BY unzip /tmp/xinkid_install_twrp/xinkid_install_twrp.zip
+    $BY sh /tmp/xinkid_install_twrp/META-INF/com/google/android/update-binary dummy 1 /tmp/xinkid_install_twrp/xinkid_install_twrp.zip
+    rm -rf /tmp/*
+fi
+
+
+#替换data所有文件
+repType=data
+for file in `find $BASH_PATH/${repType}_files/* -type f` ; do
+	tmpPath=${file%/*}									#刷机包中的路径
+	sysfile=${repType}${file##*${repType}_files}	#准备要替换或增加的目标文件
+	sysPath=${sysfile%/*}					#准备要替换或增加的文件
+	ui_print "- 备份并替换 $file"
+	$BY mkdir -p /$sysPath					#创建目标目录 /system/app/Via/
+	$BY cp  $file /$sysfile					#替换文件
+	$BY chmod 644 /$sysfile					#修复权限
+done
+
+ui_print "- 增加相机内测功能"
+$BY mkdir -p /sdcard/DCIM/Camera
+$BY touch /sdcard/DCIM/Camera/lab_options_visible
+
+ui_print "- 开始关闭模块"
+for model in `ls -d /data/adb/modules/*` ; do
+	$BY touch $model/disable
+done
+
+AdCreateFiles="
+#小米广告
+/data/media/0/miad
+#去除安全中心广告
+/data/data/com.miui.securitycenter/files/securityscan_homelist_cache
+#去除 咸鱼开屏广告
+/data/media/0/Android/data/com.taobao.idlefish/files/ad
+#去除 网易云广告，不知道哪个有效，一个大写一个小写
+/data/media/0/Android/data/com.netease.cloudmusic/cache/ad
+/data/media/0/Android/data/com.netease.cloudmusic/cache/Ad
+#去除 抖音广告
+/data/media/0/Android/data/com.ss.android.ugc.aweme/splashCache
+/data/media/0/Android/data/com.ss.android.ugc.aweme/awemeSplashCache
+/data/media/0/Android/data/com.ss.android.ugc.aweme/liveSplashCache
+#QQ音乐
+/data/media/0/Android/data/com.tencent.qqmusic/files/cache/splash
+#酷我音乐
+/data/media/0/Android/data/cn.kuwo.player/files/KuwoMusic/.screenad
+#腾讯视频
+/data/data/com.tencent.qqlive/files/ad_cache
+/data/data/com.tencent.qqlive/files/qad_cache
+/data/media/0/Android/data/com.tencent.qqlive/files/SplashPreload
+#美团外卖
+/data/media/0/Android/data/com.sankuai.meituan.takeoutnew/cache
+#UC浏览器
+/data/media/0/Android/data/com.UCMobile/files/UCDownloads
+#QQ浏览器
+/data/data/com.tencent.mtt/app_adnet
+/data/data/com.tencent.mtt/files/data/splash
+#腾讯新闻
+/data/data/com.tencent.news/files/ad_cache
+/data/data/com.tencent.news/files/tad_cache
+/data/media/0/Android/data/com.tencent.news/files/ad
+#迅雷
+/data/media/0/Android/data/com.xunlei.downloadprovider/files/splash
+/data/media/0/Android/data/com.xunlei.downloadprovider/cache/splash_image
+#应用汇
+/data/data/com.yingyonghui.market/cache
+#百度地图
+/data/media/0/Android/data/com.baidu.BaiduMap/BaiduMap/cache/AdvertImageCache
+#全民小说
+/data/media/0/Android/data/com.duokan.free/cache/splash_ad_cache
+/data/media/0/Android/data/com.duokan.free/cache/splash_video_cache
+"
+
+ui_print "- 开始禁止广告文件"
+for file in $AdCreateFiles ; do
+	if [ "${file:0:1}" == "/" ];then	#如果 /开头则确定是目录，就进行处理
+		echo $file
+		$BY rm -rf $file
+		$BY mkdir -p $(dirname "$file")
+		$BY touch $file
+		#$BY chmod 000 $file
+	else
+		ui_print $file
+	fi
+done
+
+#其它从MMX搬来的删除垃圾文件
+DeleteFiles="
+/data/media/0/360
+/data/media/0/tad
+/data/media/0/mivideo
+/data/media/0/MT2/.temp/*
+/data/media/0/MiMarket
+/data/media/0/OSSLog
+/data/media/0/QQBrowser
+/data/media/0/bytedance
+/data/media/0/cache
+/data/media/0/dctp
+/data/media/0/did
+/data/media/0/duilite
+/data/media/0/tbs
+/data/media/0/tga
+/data/media/0/ttscache
+/data/media/0/txrtmp
+/data/media/0/.cc
+/data/media/0/.com.taobao.dp
+/data/media/0/.DataStorage
+/data/media/0/.gs_file
+/data/media/0/.OAIDSystemConfigh
+/data/media/0/.OAIDSystemConfig
+/data/media/0/.tbs
+/data/media/0/.turingdebug
+/data/media/0/.UTSystemConfig
+/data/media/0/.vivo
+/data/media/0/umeng_cache
+/data/media/0/.gs_fs0
+/data/media/0/.gs_fs3
+/data/media/0/.gs_fs6
+/data/media/0/mipush
+/data/media/0/.turing.dat
+/data/media/0/.zzz
+/data/media/0/.um
+/data/media/0/.a.dat
+/data/media/0/.a.dat
+/data/media/0/.uxx
+/data/media/0/.*Trash*
+/data/media/0/.Android
+/data/media/0/.BD_SAPI_CACHE
+/data/media/0/.ColombiaMedia
+/data/media/0/.volley.cache
+/data/media/0/at
+/data/media/0/baidu
+/data/media/0/libs
+/data/media/0/setup
+/data/media/0/sitemp
+/data/media/0/Subtitles
+/data/media/0/GX_Download
+/data/media/0/1
+/data/media/0/.UTSystemConfig
+/data/media/0/.turingdebug
+/data/media/0/.Trusfort
+/data/media/0/.pzir
+/data/media/0/.protected_image
+/data/media/0/.mm_sdk_source
+/data/media/0/.lm_device
+/data/media/0/.INSTALLATION
+/data/media/0/.Download
+/data/media/0/.dlprovider
+/data/media/0/.andro
+/data/media/0/miad
+/data/media/0/sina/weibo/imageMapper_cache
+/data/media/0/logs
+/data/media/0/logger
+/data/media/0/eg.a
+/data/media/0/Download/.cu
+/proc/sys/debug/*
+/sys/kernel/debug/*
+/data/system/dropbox/*
+/dev/fscklogs/*
+/data/system/package_cache/*
+/data/tombstones/*
+/data/local/*
+/data/system/nativedebug/*
+/data/media/0/.com.android.providers.downloads.ui/*
+/data/media/0/.com.android.providers.downloads/*
+/data/user_de/0/com.miui.home/cache/debug_log
+/data/user/0/com.douban.frodo/app_rexxar-douban
+/data/user/0/com.douban.frodo/cache
+/data/vendor/wlan_logs
+/data/user/0/com.picsart.studio/files/bitmap_cache/editor/view
+"
+
+ui_print "- 开始删除缓存文件"
+for file in $DeleteFiles ; do
+	if [ "${file:0:1}" == "/" ];then	#如果 /开头则确定是目录，就进行处理
+		$BY rm -rf $file	
+	fi
+done
+
+
+ui_print "- 清理 日志"
+$BY rm -rf /data/vendor/wlan_logs
+$BY mkdir -p /data/vendor
+$BY touch /data/vendor/wlan_logs
+#$BY chmod 000 /data/vendor/wlan_logs
+#补充清理日记
+find /data/media/0/ -name '.td-3' -type f -print -exec rm -rf {} \;
+find /data/media/0/ -name '.tdck' -type f -print -exec rm -rf {} \;
+find /data/media/0/ -name '*.log' -type f -print -exec rm -rf {} \;
+find /data/media/0/ -name '*.tmp' -type f -print -exec rm -rf {} \;
+find /data/media/0/ -name '*.log.*' -type f -print -exec rm -rf {} \;
+find /data/media/0/ -name '*._log.*' -type f -print -exec rm -rf {} \;
+
+ui_print "- 删除多余文件"
+$BY rm -rf /system_root/lost+found
+$BY rm -rf /cache/lost+found
+$BY rm -rf /data/lost+found
+$BY rm -rf /data/magisk_backup_*
+$BY rm -rf /mnt/vendor/persist/lost+found
+$BY rm -rf /data/dalvik-cache
+$BY rm -rf /data/system/package_cache
+
+ui_print "- 禁用广告"
+$BY touch /data/media/0/sina/weibo/imageMapper_cache
+$BY touch /data/media/0/tad
+$BY touch /data/media/0/GX_Download
+$BY touch /data/media/0/miad
+$BY touch /data/media/0/umeng_cache
+#$BY chattr +i /data/media/0/tad
+#$BY chattr +i /data/media/0/GX_Download
+#$BY chattr +i /data/media/0/miad
+#$BY chattr +i /data/media/0/umeng_cache
+#$BY chattr +i /data/media/0/sina/weibo/imageMapper_cache
+
+ui_print "- 禁止mi-rcs写入日志"
+$BY rm -rf /data/media/0/JuphoonService
+$BY touch /data/media/0/JuphoonService
+#$BY chmod 000 /data/media/0/JuphoonService
+
+ui_print "- 禁止桌面和面具写入日记"
+$BY rm -rf /cache/magisk.log
+$BY touch   /cache/magisk.log
+#$BY chmod 000  /cache/magisk.log
+#$BY chattr +i  /cache/magisk.log
+$BY mkdir -p /data/user_de/0/com.miui.home/cache
+$BY rm -rf /data/user_de/0/com.miui.home/cache/debug_log
+$BY touch   /data/user_de/0/com.miui.home/cache/debug_log
+#$BY chmod 000  /data/user_de/0/com.miui.home/cache/debug_log 

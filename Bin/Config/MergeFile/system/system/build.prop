@@ -1,0 +1,4 @@
+#Hais丶ROM
+ro.vendor.audio.sfx.harmankardon=1
+persist.sys.allow_sys_app_update=true
+ro.hais.tag=V3
