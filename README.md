@@ -23,7 +23,7 @@ PS：群内有使用教程、精简列表请前往Q群 [927251103](https://jq.qq
 
 ###### 在电脑(x86、x64)的Ubuntu、Debian中可直接输入命令使用。
 
-`bash <(curl -s https://gitee.com/hais/HaisTools/raw/V4/Bin/0.NetInstall.sh)`
+`bash <(curl -s https://github.com/Huucong95/HaisTools-V4/blob/main/Bin/0.NetInstall.sh)`
 
 
 ###### 在支持 WSL 的 Windows10、11上使用。
@@ -45,7 +45,7 @@ Ps:如果闪退,请打开debian.exe按照提示解决.
 
 2、执行命令安装Debian (总感觉Ubutnu比较臃肿)
 
-`bash <(curl -s https://gitee.com/hais/HaisTools/raw/V4-ARM/Bin/0.ArmInstall.sh)`
+`bash <(curl -s https://github.com/Huucong95/HaisTools-V4/blob/main/Bin/0.Install.sh)`
 
 3、安装好 Debian 后，重启软件、记得要重启、重启、重启后继续。
 
