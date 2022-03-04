@@ -1,0 +1,48 @@
+# This is a basic workflow to help you get started with Actions 0389905577
+
+name: vietsub_build
+
+on:
+  workflow_dispatch:
+    inputs:
+     ROM_URL:
+      description: 'OTA Url'
+      required: true
+      default: ''
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+       - name: Checkout
+         uses: actions/checkout@v2
+       
+       - name: Setting up
+         run: |
+            sudo apt-get install -y git wget zip unzip img2simg simg2img brotli axel
+            
+       - name: Download ROM
+         run: |
+            cd $GITHUB_WORKSPACE
+            axel -n $(nproc) ${{ github.event.inputs.ROM_URL }} 
+            
+       - name: Set up Rclone 
+         run: |
+             cd $GITHUB_WORKSPACE
+             curl https://rclone.org/install.sh | sudo bash
+             cp rclone.conf ~/
+             mkdir ~/.config/rclone/
+             cp rclone.conf ~/.config/rclone/
+              
+       - name: VietSubing 
+         run: |
+            cd $GITHUB_WORKSPACE
+            sudo chmod 777 -R *
+            ./bhlnk.sh
+            
+            
+       - name: Upload to Team drive 
+         run: |
+            cd $GITHUB_WORKSPACE
+            ./bhlnk.sh upload
+            
