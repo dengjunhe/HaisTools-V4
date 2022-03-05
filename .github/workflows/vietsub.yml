@@ -39,7 +39,10 @@ jobs:
             cd $GITHUB_WORKSPACE
             sudo chmod 777 -R *
             ./HaisAuto.sh miui_CEZANNE_22.3.1_f3f3bb934c_11.0.zip
-            
+        - name: permission
+            run: |
+            cd $GITHUB_WORKSPACE
+            sudo chmod 777 -R *
        - name: Upload 
          uses: Difegue/action-megacmd@1.2.0
          with:
